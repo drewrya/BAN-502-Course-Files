@@ -1,0 +1,43 @@
+```{r}
+options(tidyverse.quiet = TRUE)
+library(titanic)
+library(tidyverse)
+library(tidymodels)
+library(mice) #package for imputation
+library(VIM) #visualizing missingness
+library(naniar) #visualizing missingness
+library(skimr) #alternative way to view dataset summaries
+library(UpSetR) #visualizing missingness
+```
+
+```{r}
+library(readr)
+grades <- read_csv("class-grades.csv")
+skim(grades)
+```
+```{r}
+vim_plot = aggr(grades, numbers = TRUE, prop = c(TRUE, FALSE),cex.axis=.7)
+#the cex.axis reduces size of text on x-axis so labels fit better
+```
+
+```{r}
+grades_rowdel = grades %>% drop_na() 
+```
+
+```{r}
+set.seed(123) #sets seed for random number generator
+imp_Final = mice(grades, m=5, method='pmm', printFlag=FALSE)
+#m is the number of imputations, 5 is a reasonable value as a default
+#pmm is "predictive mean matching" = imputation method for numeric data
+#printFlag reduces amount of output
+summary(imp_Final)
+```
+```{r}
+summary(grades)
+```
+```{r}
+grades_complete = complete(imp_Final) 
+summary(grades_complete)
+```
+
+

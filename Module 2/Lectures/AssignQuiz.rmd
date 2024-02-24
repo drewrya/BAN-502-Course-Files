@@ -1,0 +1,72 @@
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(lmtest) #for the Durbin-Watson test
+
+air = airquality
+```
+
+```{r}
+str(air)
+summary(air)
+
+ggpairs(air)
+```
+
+```{r}
+air2 = air %>% drop_na()
+
+```
+```{r}
+ggpairs(air2)
+```
+
+```{r}
+ggcorr(air2, label = TRUE)
+```
+
+```{r}
+p1 = ggplot(air2, aes(x=Temp,y=Ozone)) + geom_point()
+p1
+```
+
+```{r}
+air2_simple = recipe(Ozone ~ Temp, air2)
+air2_simple
+```
+```{r}
+lm_model = #give the model type a name 
+  linear_reg() %>% #specify that we are doing linear regression
+  set_engine("lm") #specify the specify type of linear tool we want to use 
+```
+
+```{r}
+lm_wflow = 
+  workflow() %>% 
+  add_model(lm_model) %>% 
+  add_recipe(air2_simple)
+```
+
+```{r}
+lm_fit = fit(lm_wflow, air2)
+```
+
+```{r}
+summary(lm_fit$fit$fit$fit) 
+```
+
+```{r}
+confint(lm_fit$fit$fit$fit) 
+```
+
+```{r}
+#Using predict function
+testdata = data.frame(Temp = c(75,80.00, 100))
+predict(lm_fit, new_data = testdata)
+```
+
+```{r}
+dwtest(lm_fit$fit$fit$fit)
+```
+
